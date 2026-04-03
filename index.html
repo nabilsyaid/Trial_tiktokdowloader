@@ -3,22 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VidSave — TikTok & Facebook Downloader</title>
+<title>VidSave — TikTok, Instagram & Facebook Downloader</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0a0a0f;
     --surface: #13131a;
     --surface2: #1c1c27;
-    --accent: #ff2d55;
-    --accent2: #ff6b35;
-    --fb: #1877f2;
-    --fb2: #42a5f5;
     --text: #f0f0f5;
     --muted: #6b6b80;
     --border: #2a2a38;
     --success: #00e5a0;
     --radius: 12px;
+    --ac: #ff2d55;
+    --ac2: #ff6b35;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,7 +29,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 40px 16px;
+    padding: 36px 16px 60px;
     position: relative;
     overflow-x: hidden;
   }
@@ -49,452 +47,191 @@
   }
 
   .blob1, .blob2 {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(80px);
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.3;
-    transition: background 0.5s;
+    position: fixed; border-radius: 50%; filter: blur(90px);
+    pointer-events: none; z-index: 0; opacity: 0.28; transition: background 0.5s;
   }
-  .blob1 {
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, #ff2d55 0%, transparent 70%);
-    top: -100px; left: -100px;
-  }
-  .blob2 {
-    width: 350px; height: 350px;
-    background: radial-gradient(circle, #ff6b35 0%, transparent 70%);
-    bottom: -80px; right: -80px;
-  }
-  body.fb-mode .blob1 {
-    background: radial-gradient(circle, #1877f2 0%, transparent 70%);
-  }
-  body.fb-mode .blob2 {
-    background: radial-gradient(circle, #42a5f5 0%, transparent 70%);
-  }
+  .blob1 { width: 420px; height: 420px; top: -120px; left: -120px; background: radial-gradient(circle, var(--ac) 0%, transparent 70%); }
+  .blob2 { width: 360px; height: 360px; bottom: -90px; right: -90px; background: radial-gradient(circle, var(--ac2) 0%, transparent 70%); }
 
   .wrapper {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 640px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+    position: relative; z-index: 1;
+    width: 100%; max-width: 660px;
+    display: flex; flex-direction: column; gap: 22px;
   }
 
   header { text-align: center; }
 
   .logo {
     font-family: 'Syne', sans-serif;
-    font-size: 2.8rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, #ff2d55, #ff6b35);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -1px;
-    line-height: 1;
-    margin-bottom: 6px;
-    transition: background 0.4s;
-  }
-  body.fb-mode .logo {
-    background: linear-gradient(135deg, #1877f2, #42a5f5);
-    -webkit-background-clip: text;
-    background-clip: text;
+    font-size: 2.8rem; font-weight: 800;
+    background: linear-gradient(135deg, var(--ac), var(--ac2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    letter-spacing: -1px; line-height: 1; margin-bottom: 6px;
   }
 
-  .tagline {
-    color: var(--muted);
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
+  .tagline { color: var(--muted); font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; }
 
-  /* Platform Tabs */
+  /* Tabs */
   .tabs {
-    display: flex;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 6px;
-    gap: 6px;
+    display: flex; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 14px; padding: 5px; gap: 5px;
   }
 
   .tab-btn {
-    flex: 1;
-    padding: 12px;
-    border: none;
-    border-radius: 10px;
-    background: transparent;
-    color: var(--muted);
-    font-family: 'Syne', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.25s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    flex: 1; padding: 11px 8px;
+    border: 1px solid transparent; border-radius: 10px;
+    background: transparent; color: var(--muted);
+    font-family: 'Syne', sans-serif; font-size: 0.82rem; font-weight: 700;
+    cursor: pointer; transition: all 0.25s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
   }
 
-  .tab-btn.active-tiktok {
-    background: linear-gradient(135deg, rgba(255,45,85,0.2), rgba(255,107,53,0.15));
-    color: var(--accent);
-    border: 1px solid rgba(255,45,85,0.3);
-  }
-
-  .tab-btn.active-fb {
-    background: linear-gradient(135deg, rgba(24,119,242,0.2), rgba(66,165,245,0.15));
-    color: var(--fb);
-    border: 1px solid rgba(24,119,242,0.3);
-  }
-
-  .tab-icon { font-size: 1.1rem; }
+  .tab-btn.act-tt { background: linear-gradient(135deg,rgba(255,45,85,0.22),rgba(255,107,53,0.18)); border-color: rgba(255,45,85,0.35); color: #ff2d55; }
+  .tab-btn.act-ig { background: linear-gradient(135deg,rgba(225,48,108,0.22),rgba(247,119,55,0.18)); border-color: rgba(225,48,108,0.35); color: #e1306c; }
+  .tab-btn.act-fb { background: linear-gradient(135deg,rgba(24,119,242,0.22),rgba(66,165,245,0.18)); border-color: rgba(24,119,242,0.35); color: #1877f2; }
 
   /* Card */
   .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 26px;
+    display: flex; flex-direction: column; gap: 18px;
   }
 
-  .input-group { display: flex; flex-direction: column; gap: 8px; }
-
-  label {
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-  }
+  .field { display: flex; flex-direction: column; gap: 8px; }
+  .field-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); }
 
   input[type="text"] {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    color: var(--text);
-    font-family: 'Space Mono', monospace;
-    font-size: 0.85rem;
-    outline: none;
-    transition: border-color 0.2s;
+    width: 100%; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 13px 15px; color: var(--text);
+    font-family: 'Space Mono', monospace; font-size: 0.83rem;
+    outline: none; transition: border-color 0.2s;
   }
-
-  input[type="text"]:focus { border-color: var(--accent); }
-  body.fb-mode input[type="text"]:focus { border-color: var(--fb); }
+  input[type="text"]:focus { border-color: var(--ac); }
   input[type="text"]::placeholder { color: var(--muted); }
 
-  /* Quality */
-  .quality-group { display: flex; flex-direction: column; gap: 10px; }
+  .options-row { display: flex; gap: 8px; flex-wrap: wrap; }
 
-  .quality-options { display: flex; gap: 10px; flex-wrap: wrap; }
-
-  .quality-btn {
-    flex: 1;
-    min-width: 72px;
-    padding: 10px 12px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--muted);
-    font-family: 'Space Mono', monospace;
-    font-size: 0.78rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: center;
+  .opt-btn {
+    flex: 1; min-width: 70px; padding: 10px 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); color: var(--muted);
+    font-family: 'Space Mono', monospace; font-size: 0.75rem;
+    cursor: pointer; transition: all 0.2s; text-align: center;
   }
+  .opt-btn:hover { border-color: var(--ac); color: var(--text); }
+  .opt-btn.active { border-color: var(--ac); color: var(--ac); font-weight: 700; background: var(--surface); }
 
-  .quality-btn:hover { border-color: var(--accent); color: var(--text); }
-  body.fb-mode .quality-btn:hover { border-color: var(--fb); }
-
-  .quality-btn.active {
-    background: linear-gradient(135deg, rgba(255,45,85,0.2), rgba(255,107,53,0.15));
-    border-color: var(--accent);
-    color: var(--accent);
-    font-weight: 700;
-  }
-  body.fb-mode .quality-btn.active {
-    background: linear-gradient(135deg, rgba(24,119,242,0.2), rgba(66,165,245,0.15));
-    border-color: var(--fb);
-    color: var(--fb);
-  }
-
-  /* Toggle */
   .toggle-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 13px 15px;
   }
+  .toggle-info { display: flex; flex-direction: column; gap: 2px; }
+  .toggle-info .t1 { font-size: 0.83rem; color: var(--text); }
+  .toggle-info .t2 { font-size: 0.7rem; color: var(--success); }
 
-  .toggle-label { display: flex; flex-direction: column; gap: 2px; }
-  .toggle-label span:first-child { font-size: 0.85rem; color: var(--text); }
-  .toggle-label span:last-child { font-size: 0.72rem; color: var(--success); }
-
-  .toggle { position: relative; width: 44px; height: 24px; }
+  .toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
   .toggle input { opacity: 0; width: 0; height: 0; }
-
-  .toggle-slider {
-    position: absolute;
-    inset: 0;
-    background: var(--border);
-    border-radius: 24px;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-
-  .toggle-slider::after {
-    content: '';
-    position: absolute;
-    width: 18px; height: 18px;
-    left: 3px; top: 3px;
-    background: white;
-    border-radius: 50%;
-    transition: 0.3s;
-  }
-
+  .toggle-slider { position: absolute; inset: 0; background: var(--border); border-radius: 24px; cursor: pointer; transition: 0.3s; }
+  .toggle-slider::after { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: 0.3s; }
   input:checked + .toggle-slider { background: var(--success); }
   input:checked + .toggle-slider::after { transform: translateX(20px); }
 
-  /* Fetch Button */
+  .notice {
+    border-radius: var(--radius); padding: 11px 14px;
+    font-size: 0.71rem; line-height: 1.65;
+  }
+  .notice.ig { background: rgba(225,48,108,0.07); border: 1px solid rgba(225,48,108,0.2); color: #e1a0b8; }
+  .notice.fb { background: rgba(24,119,242,0.07); border: 1px solid rgba(24,119,242,0.2); color: #90b8f8; }
+
   .btn-fetch {
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border: none;
-    border-radius: var(--radius);
-    color: white;
-    font-family: 'Syne', sans-serif;
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    transition: all 0.25s;
+    width: 100%; padding: 15px;
+    background: linear-gradient(135deg, var(--ac), var(--ac2));
+    border: none; border-radius: var(--radius);
+    color: white; font-family: 'Syne', sans-serif;
+    font-size: 0.95rem; font-weight: 700; letter-spacing: 0.05em;
+    cursor: pointer; transition: all 0.25s;
   }
-
-  .btn-fetch:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 24px rgba(255,45,85,0.35);
-  }
-  body.fb-mode .btn-fetch {
-    background: linear-gradient(135deg, var(--fb), var(--fb2));
-  }
-  body.fb-mode .btn-fetch:hover {
-    box-shadow: 0 8px 24px rgba(24,119,242,0.35);
-  }
-
+  .btn-fetch:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
   .btn-fetch:active { transform: translateY(0); }
   .btn-fetch:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-  /* Status */
   .status {
-    display: none;
-    align-items: center;
-    gap: 10px;
-    padding: 14px 16px;
-    border-radius: var(--radius);
-    font-size: 0.8rem;
+    display: none; align-items: center; gap: 10px;
+    padding: 13px 15px; border-radius: var(--radius); font-size: 0.78rem;
   }
-
-  .status.loading {
-    display: flex;
-    background: rgba(255,107,53,0.1);
-    border: 1px solid rgba(255,107,53,0.3);
-    color: var(--accent2);
-  }
-  body.fb-mode .status.loading {
-    background: rgba(24,119,242,0.1);
-    border-color: rgba(24,119,242,0.3);
-    color: var(--fb2);
-  }
-
-  .status.error {
-    display: flex;
-    background: rgba(255,45,85,0.1);
-    border: 1px solid rgba(255,45,85,0.3);
-    color: var(--accent);
-  }
-
-  .status.success {
-    display: flex;
-    background: rgba(0,229,160,0.08);
-    border: 1px solid rgba(0,229,160,0.25);
-    color: var(--success);
-  }
+  .status.loading { display: flex; background: rgba(255,107,53,0.1); border: 1px solid rgba(255,107,53,0.25); color: #ff9f6b; }
+  .status.error { display: flex; background: rgba(255,45,85,0.1); border: 1px solid rgba(255,45,85,0.25); color: #ff6b8a; }
+  .status.success { display: flex; background: rgba(0,229,160,0.08); border: 1px solid rgba(0,229,160,0.2); color: var(--success); }
 
   .spinner {
-    width: 16px; height: 16px;
-    border: 2px solid rgba(255,107,53,0.3);
-    border-top-color: var(--accent2);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    flex-shrink: 0;
+    width: 15px; height: 15px;
+    border: 2px solid rgba(255,159,107,0.3); border-top-color: #ff9f6b;
+    border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0;
   }
-  body.fb-mode .spinner {
-    border-color: rgba(24,119,242,0.3);
-    border-top-color: var(--fb2);
-  }
-
   @keyframes spin { to { transform: rotate(360deg); } }
 
   /* Result */
   .result-card {
-    display: none;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 24px;
-    gap: 20px;
-    flex-direction: column;
+    display: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 22px; flex-direction: column; gap: 18px;
     animation: fadeUp 0.4s ease forwards;
   }
-
   .result-card.show { display: flex; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
+  .vid-preview { display: flex; gap: 14px; align-items: flex-start; }
+
+  .thumb {
+    width: 86px; height: 114px; border-radius: 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    overflow: hidden; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
   }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; }
 
-  .video-preview { display: flex; gap: 16px; align-items: flex-start; }
-
-  .thumb-wrapper {
-    width: 90px;
-    height: 120px;
-    border-radius: 10px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    overflow: hidden;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--muted);
-    font-size: 1.8rem;
+  .vid-meta { flex: 1; display: flex; flex-direction: column; gap: 7px; }
+  .vid-title {
+    font-family: 'Syne', sans-serif; font-size: 0.88rem; font-weight: 700;
+    color: var(--text); line-height: 1.4;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
   }
+  .vid-author { font-size: 0.73rem; color: var(--ac); }
+  .vid-dur { font-size: 0.7rem; color: var(--muted); }
 
-  .thumb-wrapper img { width: 100%; height: 100%; object-fit: cover; }
-
-  .video-meta { flex: 1; display: flex; flex-direction: column; gap: 8px; }
-
-  .video-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--text);
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .video-author { font-size: 0.75rem; color: var(--accent); }
-  body.fb-mode .video-author { color: var(--fb2); }
-
-  .video-stats { display: flex; gap: 12px; flex-wrap: wrap; }
-
-  .stat { font-size: 0.7rem; color: var(--muted); display: flex; align-items: center; gap: 4px; }
-
-  .download-options { display: flex; flex-direction: column; gap: 10px; }
-
-  .download-section-label {
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-  }
-
-  .download-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+  .dl-section { display: flex; flex-direction: column; gap: 10px; }
+  .dl-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); }
+  .dl-btns { display: flex; gap: 8px; flex-wrap: wrap; }
 
   .btn-dl {
-    flex: 1;
-    min-width: 120px;
-    padding: 12px 16px;
-    border-radius: var(--radius);
-    border: 1px solid;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.78rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: center;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
+    flex: 1; min-width: 110px; padding: 11px 12px;
+    border-radius: var(--radius); border: 1px solid;
+    font-family: 'Space Mono', monospace; font-size: 0.74rem;
+    cursor: pointer; transition: all 0.2s;
+    text-align: center; text-decoration: none;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
   }
-
-  .btn-dl.primary {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-color: transparent;
-    color: white;
-  }
-  .btn-dl.primary.fb-color {
-    background: linear-gradient(135deg, var(--fb), var(--fb2));
-  }
-
-  .btn-dl.primary:hover { box-shadow: 0 6px 20px rgba(255,45,85,0.3); transform: translateY(-1px); }
-  .btn-dl.primary.fb-color:hover { box-shadow: 0 6px 20px rgba(24,119,242,0.3); }
-
-  .btn-dl.secondary {
-    background: var(--surface2);
-    border-color: var(--border);
-    color: var(--text);
-  }
-
-  .btn-dl.secondary:hover { border-color: var(--accent); color: var(--accent); }
-  body.fb-mode .btn-dl.secondary:hover { border-color: var(--fb); color: var(--fb); }
+  .btn-dl.pri { background: linear-gradient(135deg, var(--ac), var(--ac2)); border-color: transparent; color: white; }
+  .btn-dl.pri:hover { transform: translateY(-1px); box-shadow: 0 5px 18px rgba(0,0,0,0.4); }
+  .btn-dl.sec { background: var(--surface2); border-color: var(--border); color: var(--text); }
+  .btn-dl.sec:hover { border-color: var(--ac); color: var(--ac); }
+  .btn-dl.aud { background: rgba(0,229,160,0.1); border-color: rgba(0,229,160,0.3); color: var(--success); }
+  .btn-dl.aud:hover { background: rgba(0,229,160,0.18); transform: translateY(-1px); }
 
   .badge {
-    display: inline-block;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.65rem;
-    background: rgba(0,229,160,0.15);
-    color: var(--success);
-    border: 1px solid rgba(0,229,160,0.3);
-    margin-left: 4px;
+    padding: 1px 5px; border-radius: 4px; font-size: 0.62rem;
+    background: rgba(0,229,160,0.15); color: var(--success); border: 1px solid rgba(0,229,160,0.3);
   }
 
   .info-box {
-    background: rgba(255,45,85,0.05);
-    border: 1px solid rgba(255,45,85,0.15);
-    border-radius: var(--radius);
-    padding: 12px 16px;
-    font-size: 0.73rem;
-    color: var(--muted);
-    line-height: 1.6;
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 11px 14px;
+    font-size: 0.71rem; color: var(--muted); line-height: 1.7;
   }
-  body.fb-mode .info-box {
-    background: rgba(24,119,242,0.05);
-    border-color: rgba(24,119,242,0.15);
-  }
+  .info-box strong { color: var(--ac); }
 
-  .info-box strong { color: var(--accent); }
-  body.fb-mode .info-box strong { color: var(--fb2); }
-
-  /* FB panel hidden by default */
-  #fbPanel { display: none; }
-  #fbPanel.active { display: contents; }
-  #tiktokPanel.active { display: contents; }
-
-  footer {
-    text-align: center;
-    font-size: 0.7rem;
-    color: var(--muted);
-    margin-top: 6px;
-  }
+  footer { text-align: center; font-size: 0.68rem; color: var(--muted); margin-top: 4px; }
 </style>
 </head>
 <body>
@@ -504,298 +241,312 @@
 
 <div class="wrapper">
   <header>
-    <div class="logo" id="logoText">VidSave</div>
-    <p class="tagline">TikTok & Facebook · Tanpa Watermark · Gratis</p>
+    <div class="logo">VidSave</div>
+    <p class="tagline">TikTok · Instagram · Facebook · Tanpa Watermark</p>
   </header>
 
-  <!-- Platform Tabs -->
   <div class="tabs">
-    <button class="tab-btn active-tiktok" id="tabTiktok" onclick="switchTab('tiktok')">
-      <span class="tab-icon">🎵</span> TikTok
-    </button>
-    <button class="tab-btn" id="tabFb" onclick="switchTab('fb')">
-      <span class="tab-icon">📘</span> Facebook
-    </button>
+    <button class="tab-btn act-tt" data-p="tt" onclick="switchTab('tt')">🎵 TikTok</button>
+    <button class="tab-btn" data-p="ig" onclick="switchTab('ig')">📸 Instagram</button>
+    <button class="tab-btn" data-p="fb" onclick="switchTab('fb')">📘 Facebook</button>
   </div>
 
-  <!-- Main Card -->
   <div class="card">
+    <div class="field">
+      <div class="field-label" id="urlLabel">URL Video TikTok</div>
+      <input type="text" id="urlInput" placeholder="https://www.tiktok.com/@user/video/..." />
+    </div>
 
-    <!-- TikTok Panel -->
-    <div id="tiktokPanel" class="active">
-      <div class="input-group">
-        <label>URL Video TikTok</label>
-        <input type="text" id="ttUrlInput" placeholder="https://www.tiktok.com/@user/video/..." />
-      </div>
+    <div class="field" id="qualityField">
+      <div class="field-label">Kualitas Video</div>
+      <div class="options-row" id="qualityOpts"></div>
+    </div>
 
-      <div class="quality-group">
-        <label>Pilih Kualitas</label>
-        <div class="quality-options" id="ttQuality">
-          <button class="quality-btn" data-q="360p">360p</button>
-          <button class="quality-btn active" data-q="720p">720p HD</button>
-          <button class="quality-btn" data-q="1080p">1080p FHD</button>
-          <button class="quality-btn" data-q="mp3">MP3</button>
-        </div>
-      </div>
-
-      <div class="toggle-row">
-        <div class="toggle-label">
-          <span>Tanpa Watermark</span>
-          <span>✓ Watermark TikTok dihapus</span>
-        </div>
-        <label class="toggle">
-          <input type="checkbox" id="ttNoWatermark" checked>
-          <span class="toggle-slider"></span>
-        </label>
+    <div class="field">
+      <div class="field-label">Mode Download</div>
+      <div class="options-row">
+        <button class="opt-btn active" data-a="no" onclick="selectA(this)">🎬 Video</button>
+        <button class="opt-btn" data-a="yes" onclick="selectA(this)">🎵 Audio MP3 Saja</button>
       </div>
     </div>
 
-    <!-- Facebook Panel -->
-    <div id="fbPanel">
-      <div class="input-group">
-        <label>URL Video Facebook</label>
-        <input type="text" id="fbUrlInput" placeholder="https://www.facebook.com/watch?v=..." />
+    <div class="toggle-row" id="wmRow">
+      <div class="toggle-info">
+        <span class="t1">Tanpa Watermark</span>
+        <span class="t2">✓ Logo TikTok dihapus otomatis</span>
       </div>
-
-      <div class="quality-group">
-        <label>Pilih Kualitas</label>
-        <div class="quality-options" id="fbQuality">
-          <button class="quality-btn active" data-q="sd">SD Normal</button>
-          <button class="quality-btn" data-q="hd">HD Tinggi</button>
-        </div>
-      </div>
+      <label class="toggle">
+        <input type="checkbox" id="noWm" checked>
+        <span class="toggle-slider"></span>
+      </label>
     </div>
 
-    <button class="btn-fetch" id="fetchBtn" onclick="handleFetch()">
-      ↓ &nbsp;Ambil Video
-    </button>
+    <div class="notice ig" id="igNotice" style="display:none;">
+      ⚠️ Hanya mendukung video/reel <strong>publik</strong>. Akun privat tidak bisa didownload.
+    </div>
+    <div class="notice fb" id="fbNotice" style="display:none;">
+      ⚠️ Hanya mendukung video <strong>publik</strong>. Video privat atau "Teman saja" tidak bisa didownload.
+    </div>
+
+    <button class="btn-fetch" id="fetchBtn" onclick="handleFetch()">↓ &nbsp;Ambil Video</button>
 
     <div class="status" id="statusBox">
-      <div class="spinner" id="spinner"></div>
+      <div class="spinner"></div>
       <span id="statusMsg"></span>
     </div>
   </div>
 
-  <!-- Result Card -->
   <div class="result-card" id="resultCard">
-    <div class="video-preview">
-      <div class="thumb-wrapper" id="thumbWrapper">🎬</div>
-      <div class="video-meta">
-        <div class="video-title" id="videoTitle">—</div>
-        <div class="video-author" id="videoAuthor">—</div>
-        <div class="video-stats">
-          <span class="stat" id="statDuration">⏱ —</span>
-        </div>
+    <div class="vid-preview">
+      <div class="thumb" id="thumb">🎬</div>
+      <div class="vid-meta">
+        <div class="vid-title" id="vidTitle">—</div>
+        <div class="vid-author" id="vidAuthor">—</div>
+        <div class="vid-dur" id="vidDur">⏱ —</div>
       </div>
     </div>
-
-    <div class="download-options">
-      <div class="download-section-label">Link Download</div>
-      <div class="download-btns" id="downloadBtns"></div>
+    <div class="dl-section">
+      <div class="dl-label">Format Download</div>
+      <div class="dl-btns" id="dlBtns"></div>
     </div>
-
     <div class="info-box">
-      <strong>Cara download:</strong> Klik tombol download → link terbuka di tab baru → <strong>tahan lama / klik kanan → Save video as</strong> untuk menyimpan.
+      <strong>Cara simpan:</strong> Klik tombol → tab baru terbuka → <strong>tahan lama (HP)</strong> atau <strong>klik kanan → Save video as (PC)</strong>.
     </div>
   </div>
 
-  <footer>Gunakan hanya untuk konten yang Anda miliki izinnya · Dibuat dengan ♥</footer>
+  <footer>Gunakan hanya untuk konten yang Anda miliki izinnya &nbsp;·&nbsp; Dibuat dengan ♥</footer>
 </div>
 
 <script>
-  let currentTab = 'tiktok';
+  const CFG = {
+    tt: { label:'TikTok', ph:'https://www.tiktok.com/@user/video/...', pat:/tiktok\.com/i, ac:'#ff2d55', ac2:'#ff6b35', actCls:'act-tt' },
+    ig: { label:'Instagram', ph:'https://www.instagram.com/reel/...', pat:/instagram\.com/i, ac:'#e1306c', ac2:'#f77737', actCls:'act-ig' },
+    fb: { label:'Facebook', ph:'https://www.facebook.com/watch?v=...', pat:/facebook\.com|fb\.watch/i, ac:'#1877f2', ac2:'#42a5f5', actCls:'act-fb' }
+  };
 
-  // Tab switch
-  function switchTab(tab) {
-    currentTab = tab;
-    const body = document.body;
-    const tiktokPanel = document.getElementById('tiktokPanel');
-    const fbPanel = document.getElementById('fbPanel');
-    const tabTiktok = document.getElementById('tabTiktok');
-    const tabFb = document.getElementById('tabFb');
+  const QUALITY = {
+    tt: [{q:'360p',l:'360p'},{q:'720p',l:'720p HD',def:true},{q:'1080p',l:'1080p FHD'}],
+    ig: [{q:'best',l:'Terbaik',def:true}],
+    fb: [{q:'sd',l:'SD Normal',def:true},{q:'hd',l:'HD Tinggi'}]
+  };
 
+  let currentTab = 'tt';
+  let audioOnly = false;
+
+  function switchTab(p) {
+    currentTab = p;
+    const c = CFG[p];
+
+    // Tabs
+    document.querySelectorAll('.tab-btn').forEach(b => b.className = 'tab-btn');
+    document.querySelector(`.tab-btn[data-p="${p}"]`).classList.add(c.actCls);
+
+    // Colors
+    document.documentElement.style.setProperty('--ac', c.ac);
+    document.documentElement.style.setProperty('--ac2', c.ac2);
+
+    // UI
+    document.getElementById('urlLabel').textContent = `URL Video ${c.label}`;
+    document.getElementById('urlInput').placeholder = c.ph;
+    document.getElementById('urlInput').value = '';
+    document.getElementById('wmRow').style.display = p === 'tt' ? 'flex' : 'none';
+    document.getElementById('igNotice').style.display = p === 'ig' ? 'block' : 'none';
+    document.getElementById('fbNotice').style.display = p === 'fb' ? 'block' : 'none';
+    document.getElementById('fetchBtn').textContent = `↓  Ambil Video ${c.label}`;
     document.getElementById('resultCard').classList.remove('show');
     document.getElementById('statusBox').className = 'status';
 
-    if (tab === 'tiktok') {
-      body.classList.remove('fb-mode');
-      tiktokPanel.className = 'active';
-      fbPanel.className = '';
-      fbPanel.style.display = 'none';
-      tiktokPanel.style.display = 'contents';
-      tabTiktok.className = 'tab-btn active-tiktok';
-      tabFb.className = 'tab-btn';
-      document.getElementById('fetchBtn').textContent = '↓  Ambil Video TikTok';
-    } else {
-      body.classList.add('fb-mode');
-      tiktokPanel.className = '';
-      tiktokPanel.style.display = 'none';
-      fbPanel.className = 'active';
-      fbPanel.style.display = 'contents';
-      tabTiktok.className = 'tab-btn';
-      tabFb.className = 'tab-btn active-fb';
-      document.getElementById('fetchBtn').textContent = '↓  Ambil Video Facebook';
-    }
+    // Quality options
+    const qOpts = document.getElementById('qualityOpts');
+    qOpts.innerHTML = '';
+    QUALITY[p].forEach(q => {
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn' + (q.def ? ' active' : '');
+      btn.dataset.q = q.q;
+      btn.textContent = q.l;
+      btn.onclick = function(){ selectQ(this); };
+      qOpts.appendChild(btn);
+    });
   }
 
-  // Quality button selection
-  document.querySelectorAll('.quality-options').forEach(group => {
-    group.querySelectorAll('.quality-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        group.querySelectorAll('.quality-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      });
-    });
-  });
+  function selectQ(btn) {
+    btn.closest('.options-row').querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
 
-  function getActiveQuality(groupId) {
-    const active = document.querySelector(`#${groupId} .quality-btn.active`);
-    return active ? active.dataset.q : null;
+  function selectA(btn) {
+    btn.closest('.options-row').querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    audioOnly = btn.dataset.a === 'yes';
+  }
+
+  function getQ() {
+    const a = document.querySelector('#qualityOpts .opt-btn.active');
+    return a ? a.dataset.q : null;
   }
 
   function setStatus(type, msg) {
     const box = document.getElementById('statusBox');
     box.className = 'status ' + type;
     document.getElementById('statusMsg').textContent = msg;
-    document.getElementById('spinner').style.display = type === 'loading' ? 'block' : 'none';
   }
 
   async function handleFetch() {
+    const url = document.getElementById('urlInput').value.trim();
+    const pl = CFG[currentTab];
     const btn = document.getElementById('fetchBtn');
-    document.getElementById('resultCard').classList.remove('show');
 
-    if (currentTab === 'tiktok') {
-      await fetchTikTok(btn);
-    } else {
-      await fetchFacebook(btn);
+    if (!url) return setStatus('error', '⚠ Masukkan URL terlebih dahulu.');
+    if (!pl.pat.test(url)) return setStatus('error', `⚠ URL tidak valid. Pastikan link dari ${pl.label}.`);
+
+    btn.disabled = true;
+    document.getElementById('resultCard').classList.remove('show');
+    setStatus('loading', `Mengambil video ${pl.label}...`);
+
+    try {
+      if (currentTab === 'tt') await fetchTikTok(url);
+      else if (currentTab === 'ig') await fetchInstagram(url);
+      else await fetchFacebook(url);
+    } catch(e) {
+      setStatus('error', '⚠ ' + (e.message || 'Terjadi kesalahan. Coba lagi.'));
+    } finally {
+      btn.disabled = false;
     }
   }
 
   // ── TikTok ──
-  async function fetchTikTok(btn) {
-    const url = document.getElementById('ttUrlInput').value.trim();
-    const noWm = document.getElementById('ttNoWatermark').checked;
-    const quality = getActiveQuality('ttQuality');
+  async function fetchTikTok(url) {
+    const quality = getQ();
+    const noWm = document.getElementById('noWm').checked;
 
-    if (!url) return setStatus('error', '⚠ Masukkan URL TikTok terlebih dahulu.');
-    if (!/tiktok\.com/i.test(url)) return setStatus('error', '⚠ URL tidak valid. Pastikan link dari TikTok.');
+    const resp = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}&hd=1`);
+    const data = await resp.json();
+    if (!data || data.code !== 0 || !data.data) throw new Error(data.msg || 'Gagal mengambil video TikTok.');
 
-    btn.disabled = true;
-    setStatus('loading', 'Mengambil video TikTok...');
+    const v = data.data;
+    setMeta(v.title || 'Tanpa judul', '@' + (v.author?.unique_id || 'unknown'), formatDur(v.duration || 0), v.cover);
 
-    try {
-      const resp = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}&hd=1`);
-      const data = await resp.json();
-      if (!data || data.code !== 0 || !data.data) throw new Error(data.msg || 'Gagal mengambil video.');
-
-      const vid = data.data;
-      document.getElementById('videoTitle').textContent = vid.title || 'Tanpa judul';
-      document.getElementById('videoAuthor').textContent = '@' + (vid.author?.unique_id || 'unknown');
-      document.getElementById('statDuration').textContent = '⏱ ' + formatDuration(vid.duration || 0);
-
-      const tw = document.getElementById('thumbWrapper');
-      tw.innerHTML = vid.cover ? `<img src="${vid.cover}" alt="thumb" onerror="this.parentElement.textContent='🎵'">` : '🎵';
-
-      const dlBtns = document.getElementById('downloadBtns');
-      dlBtns.innerHTML = '';
-
-      if (quality === 'mp3') {
-        addBtn(dlBtns, vid.music, '🎵 Audio MP3', true, false);
-      } else if (noWm) {
-        const url_ = quality === '1080p' && vid.hdplay ? vid.hdplay : vid.play;
-        addBtn(dlBtns, url_, `↓ ${quality} Tanpa WM`, true, false, 'No WM');
-        if (vid.wmplay) addBtn(dlBtns, vid.wmplay, '↓ Dengan Watermark', false, false);
+    const btns = [];
+    if (audioOnly) {
+      if (v.music) btns.push({ url: v.music, label: '🎵 Download Audio MP3', cls: 'aud', badge: 'MP3' });
+      else throw new Error('Audio tidak tersedia untuk video ini.');
+    } else {
+      if (noWm) {
+        const vidUrl = quality === '1080p' && v.hdplay ? v.hdplay : v.play;
+        btns.push({ url: vidUrl, label: `↓ ${quality} Tanpa WM`, cls: 'pri', badge: 'No WM' });
+        if (v.wmplay) btns.push({ url: v.wmplay, label: '↓ Dengan Watermark', cls: 'sec' });
       } else {
-        if (vid.wmplay) addBtn(dlBtns, vid.wmplay, `↓ ${quality}`, true, false);
-        if (vid.play) addBtn(dlBtns, vid.play, '↓ Tanpa Watermark', false, false, 'No WM');
+        if (v.wmplay) btns.push({ url: v.wmplay, label: `↓ ${quality}`, cls: 'pri' });
+        if (v.play) btns.push({ url: v.play, label: '↓ Tanpa Watermark', cls: 'sec', badge: 'No WM' });
       }
-
-      setStatus('success', '✓ Video ditemukan! Pilih format di bawah.');
-      document.getElementById('resultCard').classList.add('show');
-
-    } catch (e) {
-      setStatus('error', '⚠ ' + (e.message || 'Terjadi kesalahan.'));
-    } finally {
-      btn.disabled = false;
+      if (v.music) btns.push({ url: v.music, label: '🎵 Audio MP3', cls: 'aud', badge: 'MP3' });
     }
+
+    renderBtns(btns);
+    setStatus('success', '✓ Video ditemukan!');
+    document.getElementById('resultCard').classList.add('show');
+  }
+
+  // ── Instagram ──
+  async function fetchInstagram(url) {
+    // Via allorigins proxy → snapinsta
+    const apiUrl = `https://snapinsta.app/api/?url=${encodeURIComponent(url)}`;
+    const resp = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`);
+    const raw = await resp.json();
+
+    let data;
+    try { data = JSON.parse(raw.contents); } catch { data = null; }
+
+    // Fallback: try instafinsta
+    if (!data || !data.url) {
+      const fb2 = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://instafinsta.com/api?url=' + encodeURIComponent(url))}`);
+      const raw2 = await fb2.json();
+      try { data = JSON.parse(raw2.contents); } catch { data = null; }
+    }
+
+    if (!data || !data.url) throw new Error('Gagal mengambil video Instagram. Pastikan link valid dan akun bersifat publik.');
+
+    setMeta(data.title || 'Video Instagram', data.author || '@Instagram', data.duration || '—', data.thumbnail || null);
+
+    const btns = [];
+    if (audioOnly) {
+      if (data.audio) btns.push({ url: data.audio, label: '🎵 Audio MP3', cls: 'aud', badge: 'MP3' });
+      else throw new Error('Ekstraksi audio tidak tersedia untuk video ini.');
+    } else {
+      btns.push({ url: data.url, label: '↓ Download Video', cls: 'pri' });
+      if (data.hd) btns.push({ url: data.hd, label: '↓ HD', cls: 'sec', badge: 'HD' });
+      if (data.audio) btns.push({ url: data.audio, label: '🎵 Audio MP3', cls: 'aud', badge: 'MP3' });
+    }
+
+    renderBtns(btns);
+    setStatus('success', '✓ Video ditemukan!');
+    document.getElementById('resultCard').classList.add('show');
   }
 
   // ── Facebook ──
-  async function fetchFacebook(btn) {
-    const url = document.getElementById('fbUrlInput').value.trim();
-    const quality = getActiveQuality('fbQuality');
+  async function fetchFacebook(url) {
+    const quality = getQ();
 
-    if (!url) return setStatus('error', '⚠ Masukkan URL Facebook terlebih dahulu.');
-    if (!/facebook\.com|fb\.watch/i.test(url)) return setStatus('error', '⚠ URL tidak valid. Pastikan link dari Facebook.');
+    const apiUrl = `https://getfvid.com/api?url=${encodeURIComponent(url)}`;
+    const resp = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`);
+    const raw = await resp.json();
+    let data;
+    try { data = JSON.parse(raw.contents); } catch { throw new Error('Gagal parsing data Facebook.'); }
+    if (!data || data.error) throw new Error('Gagal mengambil video. Video mungkin privat atau URL tidak valid.');
 
-    btn.disabled = true;
-    setStatus('loading', 'Mengambil video Facebook...');
+    setMeta(data.title || 'Video Facebook', data.author || 'Facebook', data.duration || '—', data.thumbnail || null);
 
-    try {
-      // Using getfvid API (public Facebook video downloader)
-      const apiUrl = `https://getfvid.com/api?url=${encodeURIComponent(url)}`;
-      const resp = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`);
-      const raw = await resp.json();
-      const data = JSON.parse(raw.contents);
-
-      if (!data || data.error) throw new Error('Gagal mengambil video Facebook.');
-
-      document.getElementById('videoTitle').textContent = data.title || 'Video Facebook';
-      document.getElementById('videoAuthor').textContent = data.author || 'Facebook';
-      document.getElementById('statDuration').textContent = '⏱ ' + (data.duration || '—');
-
-      const tw = document.getElementById('thumbWrapper');
-      tw.innerHTML = data.thumbnail
-        ? `<img src="${data.thumbnail}" alt="thumb" onerror="this.parentElement.textContent='📘'">`
-        : '📘';
-
-      const dlBtns = document.getElementById('downloadBtns');
-      dlBtns.innerHTML = '';
-
+    const btns = [];
+    if (audioOnly) {
+      if (data.audio) btns.push({ url: data.audio, label: '🎵 Audio MP3', cls: 'aud', badge: 'MP3' });
+      else throw new Error('Ekstraksi audio tidak tersedia untuk video Facebook ini.');
+    } else {
       if (quality === 'hd' && data.hd) {
-        addBtn(dlBtns, data.hd, '↓ HD Tinggi', true, true, 'HD');
-        if (data.sd) addBtn(dlBtns, data.sd, '↓ SD Normal', false, true);
+        btns.push({ url: data.hd, label: '↓ HD Tinggi', cls: 'pri', badge: 'HD' });
+        if (data.sd) btns.push({ url: data.sd, label: '↓ SD Normal', cls: 'sec' });
       } else {
-        if (data.sd) addBtn(dlBtns, data.sd, '↓ SD Normal', true, true);
-        if (data.hd) addBtn(dlBtns, data.hd, '↓ HD Tinggi', false, true, 'HD');
+        if (data.sd) btns.push({ url: data.sd, label: '↓ SD Normal', cls: 'pri' });
+        if (data.hd) btns.push({ url: data.hd, label: '↓ HD Tinggi', cls: 'sec', badge: 'HD' });
       }
-
-      if (dlBtns.children.length === 0) throw new Error('Link download tidak ditemukan. Video mungkin privat.');
-
-      setStatus('success', '✓ Video ditemukan! Pilih format di bawah.');
-      document.getElementById('resultCard').classList.add('show');
-
-    } catch (e) {
-      setStatus('error', '⚠ ' + (e.message || 'Terjadi kesalahan. Video mungkin privat atau URL salah.'));
-    } finally {
-      btn.disabled = false;
+      if (data.audio) btns.push({ url: data.audio, label: '🎵 Audio MP3', cls: 'aud', badge: 'MP3' });
     }
+
+    if (btns.length === 0) throw new Error('Link download tidak ditemukan. Video mungkin privat.');
+    renderBtns(btns);
+    setStatus('success', '✓ Video ditemukan!');
+    document.getElementById('resultCard').classList.add('show');
   }
 
-  function addBtn(container, href, label, isPrimary, isFb, badge) {
-    if (!href) return;
-    const a = document.createElement('a');
-    a.href = href;
-    a.target = '_blank';
-    a.rel = 'noopener noreferrer';
-    a.className = `btn-dl ${isPrimary ? 'primary' : 'secondary'}${isFb && isPrimary ? ' fb-color' : ''}`;
-    a.innerHTML = label + (badge ? `<span class="badge">${badge}</span>` : '');
-    container.appendChild(a);
+  // ── Helpers ──
+  function setMeta(title, author, dur, cover) {
+    document.getElementById('vidTitle').textContent = title;
+    document.getElementById('vidAuthor').textContent = author;
+    document.getElementById('vidDur').textContent = '⏱ ' + dur;
+    const tw = document.getElementById('thumb');
+    tw.innerHTML = cover ? `<img src="${cover}" alt="thumb" onerror="this.parentElement.textContent='🎬'">` : '🎬';
   }
 
-  function formatDuration(s) {
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    return `${m}:${sec.toString().padStart(2, '0')}`;
+  function renderBtns(btns) {
+    const c = document.getElementById('dlBtns');
+    c.innerHTML = '';
+    btns.forEach(b => {
+      if (!b.url) return;
+      const a = document.createElement('a');
+      a.href = b.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      a.className = `btn-dl ${b.cls}`;
+      a.innerHTML = b.label + (b.badge ? `<span class="badge">${b.badge}</span>` : '');
+      c.appendChild(a);
+    });
   }
 
-  // Enter key
-  document.getElementById('ttUrlInput').addEventListener('keydown', e => { if (e.key === 'Enter') handleFetch(); });
-  document.getElementById('fbUrlInput').addEventListener('keydown', e => { if (e.key === 'Enter') handleFetch(); });
+  function formatDur(s) {
+    const m = Math.floor(s/60), sec = s%60;
+    return `${m}:${sec.toString().padStart(2,'0')}`;
+  }
 
-  // Init
-  switchTab('tiktok');
+  document.getElementById('urlInput').addEventListener('keydown', e => { if (e.key==='Enter') handleFetch(); });
+
+  switchTab('tt');
 </script>
 </body>
 </html>
-
